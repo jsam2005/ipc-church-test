@@ -65,15 +65,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       return;
     }
 
-    // Create detailed CSV with all answers
+    // Create detailed CSV with actual option text
     const headers = [
       'S.No', 'Name', 'Phone', 'Score', 'Total Questions', 'Percentage', 'Timestamp'
     ];
     
-    // Add question columns (Q1, Q2, Q3, etc.)
+    // Add question columns with actual option text
     const maxQuestions = Math.max(...results.map(r => r.totalQuestions));
     for (let i = 1; i <= maxQuestions; i++) {
-      headers.push(`Q${i}`);
+      headers.push(`Q${i}_Answer`);
     }
     
     const csvRows = [headers];
@@ -89,12 +89,25 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
         result.timestamp
       ];
       
-      // Add answers for each question
-      for (let i = 0; i < maxQuestions; i++) {
-        if (result.answers && result.answers[i]) {
-          row.push(result.answers[i]);
-        } else {
-          row.push('Not answered');
+      // Add actual option text for each question
+      if (result.detailedAnswers && result.detailedAnswers.length > 0) {
+        // Use detailed answers if available
+        for (let i = 0; i < maxQuestions; i++) {
+          const detailedAnswer = result.detailedAnswers[i];
+          if (detailedAnswer && detailedAnswer.userAnswerText) {
+            row.push(detailedAnswer.userAnswerText);
+          } else {
+            row.push('Not answered');
+          }
+        }
+      } else {
+        // Fallback to simple answers
+        for (let i = 0; i < maxQuestions; i++) {
+          if (result.answers && result.answers[i]) {
+            row.push(result.answers[i]);
+          } else {
+            row.push('Not answered');
+          }
         }
       }
       
@@ -109,7 +122,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `church-test-results-detailed-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `church-test-results-with-options-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
   };

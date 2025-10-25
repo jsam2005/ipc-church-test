@@ -184,7 +184,12 @@ function App() {
           userAnswerText: userAnswer ? question.options[userAnswer] : 'Not answered',
           correctAnswer: correctOption,
           correctAnswerText: correctAnswerText,
-          isCorrect: isCorrect
+          isCorrect: isCorrect,
+          // Store all options for reference
+          optionA: question.options.A,
+          optionB: question.options.B,
+          optionC: question.options.C,
+          optionD: question.options.D
         });
         
         console.log(`Question ${index + 1}: User=${userAnswer}, Correct=${correctOption}, Match=${isCorrect}`);
@@ -324,7 +329,7 @@ function App() {
   }
 
   if (currentState === 'nameInput') {
-    return (
+  return (
       <div className="app">
         <div className="name-input-container">
           <div className="name-input-content">
@@ -353,7 +358,7 @@ function App() {
                 onChange={(e) => setUserPhone(e.target.value)}
                 placeholder="Enter your phone number"
               />
-            </div>
+      </div>
             
             <button className="start-button" onClick={handleNamePhoneSubmit}>
               START TEST
