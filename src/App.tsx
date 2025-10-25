@@ -101,10 +101,13 @@ function App() {
     console.log('🗑️ Test state cleared')
   }
 
-  // Save test state whenever it changes
+  // Save test state when important changes occur (not every second)
   useEffect(() => {
-    saveTestState()
-  }, [currentState, currentQuestionIndex, answers, timeRemaining, userName, userPhone])
+    // Only save when state, question, or answers change (not every timer tick)
+    if (currentState === 'test' || currentState === 'nameInput') {
+      saveTestState()
+    }
+  }, [currentState, currentQuestionIndex, answers, userName, userPhone])
 
   // Timer effect
   useEffect(() => {
@@ -119,7 +122,17 @@ function App() {
         })
       }, 1000)
 
-      return () => clearInterval(timer)
+      // Save state every 30 seconds during the test
+      const saveInterval = setInterval(() => {
+        if (currentState === 'test') {
+          saveTestState()
+        }
+      }, 30000)
+
+      return () => {
+        clearInterval(timer)
+        clearInterval(saveInterval)
+      }
     }
   }, [currentState, timeRemaining])
 
