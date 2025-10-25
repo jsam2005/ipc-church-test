@@ -1,152 +1,186 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
-import questionsData from './data/questions.json';
+import { useState, useEffect } from 'react'
+import './App.css'
 
-type AppState = 'landing' | 'nameInput' | 'test' | 'success';
+type AppState = 'landing' | 'nameInput' | 'test' | 'success'
+type Answer = string | null
 
-interface Question {
-  id: number;
-  question: string;
-  options: {
-    A: string;
-    B: string;
-    C: string;
-    D: string;
-  };
-  correctAnswer: string;
-}
+// Question interface is defined in the JSON data structure
 
 function App() {
-  const [currentState, setCurrentState] = useState<AppState>('landing');
-  const [userName, setUserName] = useState('');
-  const [userPhone, setUserPhone] = useState('');
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [answers, setAnswers] = useState<{ [key: number]: string }>({});
-  const [timeRemaining, setTimeRemaining] = useState(15 * 60); // 15 minutes in seconds
-  const [selectedAnswer, setSelectedAnswer] = useState<string>('');
+  const [currentState, setCurrentState] = useState<AppState>('landing')
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  const [questionsData, setQuestionsData] = useState<any>(null)
+  const [answers, setAnswers] = useState<Answer[]>([])
+  const [timeRemaining, setTimeRemaining] = useState(0)
+  const [selectedAnswer, setSelectedAnswer] = useState<Answer>(null)
+  const [userName, setUserName] = useState('')
+  const [userPhone, setUserPhone] = useState('')
+  const [loading, setLoading] = useState(true)
 
-  // Shuffle array function
-  const shuffleArray = (array: Question[]) => {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  };
-
-  // Load questions on component mount
+  // Load questions from server on component mount
   useEffect(() => {
-    const shuffledQuestions = shuffleArray(questionsData);
-    setQuestions(shuffledQuestions);
-    console.log('🔄 Questions shuffled for new user - First 5 IDs:', shuffledQuestions.slice(0, 5).map(q => q.id));
-  }, []);
+    const loadQuestions = async () => {
+      try {
+        const response = await fetch('/api/questions')
+        if (!response.ok) {
+          throw new Error('Failed to load questions')
+        }
+        const data = await response.json()
+        setQuestionsData(data)
+        setAnswers(new Array(data.questions.length).fill(null))
+        setTimeRemaining(data.testDuration * 60)
+        setLoading(false)
+      } catch (error) {
+        console.error('Error loading questions:', error)
+        setLoading(false)
+      }
+    }
+    
+    loadQuestions()
+  }, [])
 
   // Timer effect
   useEffect(() => {
     if (currentState === 'test' && timeRemaining > 0) {
-      const timer = setTimeout(() => {
-        setTimeRemaining(timeRemaining - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else if (timeRemaining === 0) {
-      handleTestComplete();
+      const timer = setInterval(() => {
+        setTimeRemaining(prev => {
+          if (prev <= 1) {
+            handleTestComplete()
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+
+      return () => clearInterval(timer)
     }
-  }, [timeRemaining, currentState]);
+  }, [currentState, timeRemaining])
 
   const handleStartTest = () => {
-    setCurrentState('nameInput');
-  };
+    setCurrentState('nameInput')
+  }
 
-  const handleNamePhoneSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (userName.trim() && userPhone.trim()) {
-      setCurrentState('test');
-    } else {
-      alert('Please enter both name and phone number');
+  const handleNamePhoneSubmit = () => {
+    if (userName.trim() === '' || userPhone.trim() === '') {
+      alert('Please enter your Name and Phone Number to start the test.')
+      return
     }
-  };
+    setCurrentState('test')
+    setTimeRemaining(questionsData.testDuration * 60)
+    setCurrentQuestionIndex(0)
+    setAnswers(new Array(questionsData.questions.length).fill(null))
+    setSelectedAnswer(answers[0])
+  }
+
+  const handleTestComplete = async () => {
+    try {
+      // Calculate time spent
+      const timeSpent = questionsData.testDuration * 60 - timeRemaining;
+      
+      // Send data to backend
+      const response = await fetch('/api/save-results', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: userName,
+          phone: userPhone,
+          answers: answers,
+          timeSpent: timeSpent
+        })
+      });
+
+      if (response.ok) {
+        console.log('Results saved successfully');
+        setCurrentState('success');
+      } else {
+        console.error('Failed to save results');
+        setCurrentState('success'); // Still show success to user
+      }
+    } catch (error) {
+      console.error('Error saving results:', error);
+      setCurrentState('success'); // Still show success to user
+    }
+  }
 
   const handleAnswerSelect = (answer: string) => {
-    setSelectedAnswer(answer);
-  };
+    setSelectedAnswer(answer)
+    const newAnswers = [...answers]
+    newAnswers[currentQuestionIndex] = answer
+    setAnswers(newAnswers)
+  }
 
   const handleNextQuestion = () => {
-    if (selectedAnswer) {
-      const currentQuestionIndex = Object.keys(answers).length;
-      const currentQuestion = questions[currentQuestionIndex];
-      
-      setAnswers(prev => ({
-        ...prev,
-        [currentQuestion.id]: selectedAnswer
-      }));
-      
-      setSelectedAnswer('');
-      
-      if (currentQuestionIndex === questions.length - 1) {
-        handleTestComplete();
-      }
+    if (currentQuestionIndex < questionsData.questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1)
+      setSelectedAnswer(answers[currentQuestionIndex + 1])
+    } else {
+      handleTestComplete()
     }
-  };
+  }
 
-  const calculateScore = () => {
-    let correct = 0;
-    questions.forEach(question => {
-      const userAnswer = answers[question.id];
-      if (userAnswer === question.correctAnswer) {
-        correct++;
-      }
-    });
-    return correct;
-  };
-
-  const handleTestComplete = () => {
-    const score = calculateScore();
-    const totalQuestions = questions.length;
-    
-    // Save results to localStorage (since no backend)
-    const testResult = {
-      userName,
-      userPhone,
-      score,
-      totalQuestions,
-      answers,
-      timestamp: new Date().toLocaleString()
-    };
-    
-    // Store in localStorage
-    const existingResults = JSON.parse(localStorage.getItem('churchTestResults') || '[]');
-    existingResults.push(testResult);
-    localStorage.setItem('churchTestResults', JSON.stringify(existingResults));
-    
-    console.log('📝 Test completed:', testResult);
-    setCurrentState('success');
-  };
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1)
+      setSelectedAnswer(answers[currentQuestionIndex - 1])
+    }
+  }
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
 
-  const currentQuestionIndex = Object.keys(answers).length;
-  const currentQuestion = questions[currentQuestionIndex];
-  const score = calculateScore();
-
-  if (currentState === 'landing') {
+  // Show loading state
+  if (loading) {
     return (
       <div className="app">
-        <div className="landing-page">
-          <div className="landing-container">
-            <h1 className="landing-title">IPC Bethel Church</h1>
-            <p className="landing-subtitle">Digital One Mark Test</p>
-            <button className="start-button" onClick={handleStartTest}>
-              START TEST
+        <div className="landing-container">
+          <div className="landing-content">
+            <h1 className="landing-title">Loading Questions...</h1>
+            <p className="landing-subtitle">Please wait while we load your test</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error if questions failed to load
+  if (!questionsData) {
+    return (
+      <div className="app">
+        <div className="landing-container">
+          <div className="landing-content">
+            <h1 className="landing-title">Error Loading Test</h1>
+            <p className="landing-subtitle">Please refresh the page to try again</p>
+            <button className="start-button" onClick={() => window.location.reload()}>
+              REFRESH PAGE
             </button>
           </div>
         </div>
       </div>
-    );
+    )
+  }
+
+  const currentQuestion = questionsData.questions[currentQuestionIndex]
+
+  if (currentState === 'landing') {
+  return (
+      <div className="landing-page">
+        <div className="landing-container">
+          <h1 className="landing-title">IPC Bethel Church</h1>
+          <p className="landing-subtitle">Digital One Mark Test</p>
+          <button 
+            className="start-button"
+            onClick={handleStartTest}
+          >
+            START TEST
+          </button>
+        </div>
+      </div>
+    )
   }
 
   if (currentState === 'nameInput') {
@@ -183,11 +217,11 @@ function App() {
             
             <button className="start-button" onClick={handleNamePhoneSubmit}>
               START TEST
-            </button>
+        </button>
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   if (currentState === 'test') {
@@ -203,11 +237,11 @@ function App() {
           
           <div className="question-content">
             <p className="question-text">
-              {currentQuestion?.question}
+              {currentQuestion.question}
             </p>
             
             <div className="options-grid">
-              {Object.entries(currentQuestion?.options || {}).map(([key, value]) => (
+              {Object.entries(currentQuestion.options).map(([key, value]) => (
                 <button 
                   key={key}
                   className={`option-button ${selectedAnswer === key ? 'selected' : ''}`}
@@ -220,21 +254,27 @@ function App() {
           </div>
           
           <div className="navigation-buttons">
+            {currentQuestionIndex > 0 && (
+              <button className="nav-button prev-button" onClick={handlePreviousQuestion}>
+                PREVIOUS
+              </button>
+            )}
+            
             <button 
               className="nav-button next-button" 
               onClick={handleNextQuestion}
               disabled={!selectedAnswer}
             >
-              {currentQuestionIndex === questions.length - 1 ? 'SUBMIT' : 'NEXT'}
+              {currentQuestionIndex === questionsData.questions.length - 1 ? 'SUBMIT' : 'NEXT'}
             </button>
           </div>
           
           <div className="progress-info">
-            Question {currentQuestionIndex + 1} of {questions.length}
+            Question {currentQuestionIndex + 1} of {questionsData.questions.length}
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   if (currentState === 'success') {
@@ -244,27 +284,19 @@ function App() {
           <div className="success-content">
             <h1 className="success-title">THANK YOU!</h1>
             <p className="success-message">Your answers have been saved successfully.</p>
-            <p className="score-text">Your Score: {score}/{questions.length}</p>
             <button 
               className="restart-button"
-              onClick={() => {
-                setCurrentState('landing');
-                setUserName('');
-                setUserPhone('');
-                setAnswers({});
-                setTimeRemaining(15 * 60);
-                setSelectedAnswer('');
-              }}
+              onClick={() => setCurrentState('landing')}
             >
               TAKE TEST AGAIN
             </button>
           </div>
         </div>
       </div>
-    );
+  )
   }
 
-  return null;
+  return null
 }
 
-export default App;
+export default App
