@@ -329,7 +329,7 @@ function App() {
   }
 
   if (currentState === 'nameInput') {
-  return (
+    return (
       <div className="app">
         <div className="name-input-container">
           <div className="name-input-content">
@@ -358,11 +358,16 @@ function App() {
                 onChange={(e) => setUserPhone(e.target.value)}
                 placeholder="Enter your phone number"
               />
-      </div>
+            </div>
             
-            <button className="start-button" onClick={handleNamePhoneSubmit}>
-              START TEST
-        </button>
+            <div className="button-group">
+              <button className="back-button" onClick={() => setCurrentState('landing')}>
+                ← BACK
+              </button>
+              <button className="start-button" onClick={handleNamePhoneSubmit}>
+                START TEST
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -374,9 +379,14 @@ function App() {
       <div className="app">
         <div className="test-container">
           <div className="question-header">
-            <h2>QUESTION {currentQuestionIndex + 1}</h2>
-            <div className={`timer ${timeRemaining < 300 ? 'timer-warning' : ''}`}>
-              Time Remaining: {formatTime(timeRemaining)}
+            <div className="header-top">
+              <button className="back-to-home" onClick={() => setCurrentState('landing')}>
+                ← HOME
+              </button>
+              <h2>QUESTION {currentQuestionIndex + 1}</h2>
+              <div className={`timer ${timeRemaining < 300 ? 'timer-warning' : ''}`}>
+                Time Remaining: {formatTime(timeRemaining)}
+              </div>
             </div>
           </div>
           
@@ -429,16 +439,27 @@ function App() {
           <div className="success-content">
             <h1 className="success-title">THANK YOU!</h1>
             <p className="success-message">Your answers have been saved successfully.</p>
-            <button 
-              className="restart-button"
-              onClick={() => setCurrentState('landing')}
-            >
-              TAKE TEST AGAIN
-            </button>
+            <div className="success-buttons">
+              <button 
+                className="back-button"
+                onClick={() => setCurrentState('landing')}
+              >
+                ← BACK TO HOME
+              </button>
+              <button 
+                className="restart-button"
+                onClick={() => {
+                  clearTestState();
+                  setCurrentState('landing');
+                }}
+              >
+                TAKE TEST AGAIN
+              </button>
+            </div>
           </div>
         </div>
       </div>
-  )
+    )
   }
 
   return null
