@@ -66,12 +66,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       return;
     }
 
-    // Create detailed CSV with actual option text
+    // Debug: Log the actual data structure
+    console.log('📊 Exporting results:', results);
+    console.log('📊 First result details:', results[0]);
+    if (results[0] && results[0].detailedAnswers) {
+      console.log('📊 Detailed answers:', results[0].detailedAnswers);
+    }
+
+    // Create detailed CSV with proper data
     const headers = [
       'S.No', 'Name', 'Phone', 'Score', 'Total Questions', 'Percentage', 'Timestamp'
     ];
     
-    // Add question columns with actual option text
+    // Add question columns
     const maxQuestions = Math.max(...results.map(r => r.totalQuestions));
     for (let i = 1; i <= maxQuestions; i++) {
       headers.push(`Q${i}_Answer`);
@@ -90,25 +97,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
         result.timestamp
       ];
       
-      // Add actual option text for each question
-      if (result.detailedAnswers && result.detailedAnswers.length > 0) {
-        // Use detailed answers if available
-        for (let i = 0; i < maxQuestions; i++) {
-          const detailedAnswer = result.detailedAnswers[i];
-          if (detailedAnswer && detailedAnswer.userAnswerText) {
-            row.push(detailedAnswer.userAnswerText);
+      // Add answers for each question - use the answers array directly
+      for (let i = 0; i < maxQuestions; i++) {
+        if (result.answers && result.answers[i]) {
+          // Convert A, B, C, D to actual option text if possible
+          const answerKey = result.answers[i];
+          if (result.detailedAnswers && result.detailedAnswers[i]) {
+            // Use detailed answer text if available
+            row.push(result.detailedAnswers[i].userAnswerText || answerKey);
           } else {
-            row.push('Not answered');
+            // Fallback to the answer key (A, B, C, D)
+            row.push(answerKey);
           }
-        }
-      } else {
-        // Fallback to simple answers
-        for (let i = 0; i < maxQuestions; i++) {
-          if (result.answers && result.answers[i]) {
-            row.push(result.answers[i]);
-          } else {
-            row.push('Not answered');
-          }
+        } else {
+          row.push('Not answered');
         }
       }
       
@@ -123,7 +125,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `church-test-results-with-options-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `church-test-results-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
