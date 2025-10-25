@@ -8,6 +8,325 @@
   padding: 20px;
 }
 
+/* Desktop Admin Panel - Full Width Layout */
+@media (min-width: 1024px) {
+  .admin-login {
+    padding: 40px;
+  }
+  
+  .admin-panel {
+    max-width: none;
+    width: 100%;
+    padding: 40px;
+    background: #1A363A;
+    min-height: 100vh;
+  }
+  
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 30px 0;
+    border-bottom: 3px solid #4ECDC4;
+    background: linear-gradient(135deg, #2C4A4E 0%, #1A363A 100%);
+    border-radius: 15px;
+    padding: 30px;
+  }
+  
+  .admin-title {
+    font-size: 3rem;
+    color: #4ECDC4;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .admin-actions {
+    display: flex;
+    gap: 20px;
+    flex-direction: row !important;
+    margin: 0;
+  }
+  
+  .admin-actions button {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .export-btn {
+    background: linear-gradient(135deg, #4ECDC4 0%, #45B8B0 100%);
+    color: white;
+    border: none;
+  }
+  
+  .export-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+  }
+  
+  .clear-btn {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    color: white;
+    border: none;
+  }
+  
+  .clear-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+  }
+  
+  .back-btn {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    color: white;
+    border: none;
+  }
+  
+  .back-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+  }
+  
+  .stats-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-bottom: 40px;
+    max-width: none;
+  }
+  
+  .stat-card {
+    padding: 30px;
+    text-align: center;
+    background: linear-gradient(135deg, #2C4A4E 0%, #1A363A 100%);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    border: 2px solid #4ECDC4;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    border-color: #45B8B0;
+  }
+  
+  .stat-card h3 {
+    color: #4ECDC4;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+  }
+  
+  .stat-number {
+    font-size: 3rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .winners-section {
+    margin-bottom: 50px;
+  }
+  
+  .winners-title {
+    text-align: center;
+    color: #4ECDC4;
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .winners-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+  
+  .winner-card {
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+  
+  .winner-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  }
+  
+  .winner-card.gold {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #1A363A;
+    box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4);
+  }
+  
+  .winner-card.silver {
+    background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%);
+    color: #1A363A;
+    box-shadow: 0 15px 40px rgba(192, 192, 192, 0.4);
+  }
+  
+  .winner-card.bronze {
+    background: linear-gradient(135deg, #CD7F32 0%, #B8860B 100%);
+    color: white;
+    box-shadow: 0 15px 40px rgba(205, 127, 50, 0.4);
+  }
+  
+  .winner-rank {
+    font-size: 4rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: block;
+  }
+  
+  .winner-name {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  
+  .winner-phone {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    opacity: 0.8;
+  }
+  
+  .winner-score {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  
+  .winner-time {
+    font-size: 1rem;
+    opacity: 0.7;
+  }
+  
+  .results-section {
+    margin-bottom: 40px;
+  }
+  
+  .results-title {
+    color: #4ECDC4;
+    font-size: 2.2rem;
+    margin-bottom: 30px;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .results-table-container {
+    background: rgba(44, 74, 78, 0.9);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    overflow-x: auto;
+    border: 2px solid #4ECDC4;
+  }
+  
+  .results-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.1rem;
+    background: rgba(26, 54, 58, 0.8);
+    border-radius: 15px;
+    overflow: hidden;
+  }
+  
+  .results-table th {
+    background: linear-gradient(135deg, #4ECDC4 0%, #45B8B0 100%);
+    color: #1A363A;
+    padding: 20px 15px;
+    text-align: left;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border-bottom: 3px solid #45B8B0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .results-table td {
+    padding: 18px 15px;
+    border-bottom: 1px solid #2C4A4E;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .results-table tbody tr:hover {
+    background: rgba(78, 205, 196, 0.15);
+    transform: scale(1.02);
+    box-shadow: 0 5px 15px rgba(78, 205, 196, 0.2);
+  }
+  
+  .results-table tbody tr.top-three {
+    background: rgba(78, 205, 196, 0.1);
+    border-left: 5px solid #4ECDC4;
+  }
+  
+  .rank-cell {
+    font-weight: bold;
+    color: #4ECDC4;
+    text-align: center;
+    font-size: 1.2rem;
+  }
+  
+  .name-cell {
+    font-weight: bold;
+    color: white;
+    font-size: 1.1rem;
+  }
+  
+  .phone-cell {
+    color: #A0D9D9;
+    font-size: 1rem;
+  }
+  
+  .score-cell {
+    font-weight: bold;
+    color: #4ECDC4;
+    text-align: center;
+    font-size: 1.2rem;
+  }
+  
+  .percentage-cell {
+    font-weight: bold;
+    color: #4ECDC4;
+    text-align: center;
+    font-size: 1.1rem;
+  }
+  
+  .timestamp-cell {
+    color: #A0D9D9;
+    font-size: 0.95rem;
+  }
+  
+  .no-results {
+    text-align: center;
+    padding: 80px 40px;
+    background: rgba(44, 74, 78, 0.9);
+    border-radius: 20px;
+    margin: 40px 0;
+    border: 2px solid #4ECDC4;
+  }
+  
+  .no-results h3 {
+    color: #4ECDC4;
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .no-results p {
+    color: #A0D9D9;
+    font-size: 1.3rem;
+  }
+}
+
 .admin-login-container {
   background: rgba(255, 255, 255, 0.95);
   padding: 40px;
