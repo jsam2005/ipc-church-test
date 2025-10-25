@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import AdminPanel from './AdminPanel'
 
-type AppState = 'landing' | 'nameInput' | 'test' | 'success' | 'admin'
+type AppState = 'landing' | 'nameInput' | 'test' | 'success' | 'admin' | 'results'
 type Answer = string | null
 
 // Question interface is defined in the JSON data structure
@@ -17,6 +17,7 @@ function App() {
   const [userName, setUserName] = useState('')
   const [userPhone, setUserPhone] = useState('')
   const [loading, setLoading] = useState(true)
+  const [testResult, setTestResult] = useState<any>(null)
 
   // Load questions and restore test state
   useEffect(() => {
@@ -231,7 +232,14 @@ function App() {
       
       console.log('📝 Test completed and saved locally:', testResult);
       console.log(`🎯 Final Score: ${score}/${questionsData.questions.length}`);
-      setCurrentState('success');
+      
+      // Store the result for display
+      setTestResult({
+        ...testResult,
+        detailedAnswers
+      });
+      
+      setCurrentState('results');
       
     } catch (error) {
       console.error('Error saving results:', error);
@@ -441,6 +449,74 @@ function App() {
           
           <div className="progress-info">
             Question {currentQuestionIndex + 1} of {questionsData.questions.length}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (currentState === 'results') {
+    const percentage = Math.round((testResult.score / testResult.totalQuestions) * 100);
+    
+    return (
+      <div className="app">
+        <div className="results-container">
+          <div className="results-content">
+            <h1 className="results-title">🎉 Your Test Results</h1>
+            
+            <div className="score-summary">
+              <div className="score-card">
+                <h2>Your Score</h2>
+                <div className="score-display">
+                  <span className="score-number">{testResult.score}</span>
+                  <span className="score-total">/{testResult.totalQuestions}</span>
+                </div>
+                <div className="percentage">{percentage}%</div>
+              </div>
+            </div>
+
+            <div className="detailed-results">
+              <h3>Question-by-Question Review</h3>
+              <div className="questions-list">
+                {testResult.detailedAnswers.map((answer: any, index: number) => (
+                  <div key={index} className={`question-result ${answer.isCorrect ? 'correct' : 'incorrect'}`}>
+                    <div className="question-header">
+                      <span className="question-number">Q{answer.questionNumber}</span>
+                      <span className={`status ${answer.isCorrect ? 'correct' : 'incorrect'}`}>
+                        {answer.isCorrect ? '✓ Correct' : '✗ Wrong'}
+                      </span>
+                    </div>
+                    <div className="question-text">{answer.questionText}</div>
+                    <div className="answer-details">
+                      <div className="user-answer">
+                        <strong>Your Answer:</strong> {answer.userAnswerText}
+                      </div>
+                      <div className="correct-answer">
+                        <strong>Correct Answer:</strong> {answer.correctAnswerText}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="results-buttons">
+              <button 
+                className="back-button"
+                onClick={() => setCurrentState('landing')}
+              >
+                ← BACK TO HOME
+              </button>
+              <button 
+                className="restart-button"
+                onClick={() => {
+                  clearTestState();
+                  setCurrentState('landing');
+                }}
+              >
+                TAKE TEST AGAIN
+              </button>
+            </div>
           </div>
         </div>
       </div>
