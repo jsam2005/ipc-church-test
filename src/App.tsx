@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import './App.css'
+import AdminPanel from './AdminPanel'
 
-type AppState = 'landing' | 'nameInput' | 'test' | 'success'
+type AppState = 'landing' | 'nameInput' | 'test' | 'success' | 'admin'
 type Answer = string | null
 
 // Question interface is defined in the JSON data structure
@@ -198,9 +199,19 @@ function App() {
           >
             START TEST
           </button>
+          <button 
+            className="admin-button"
+            onClick={() => setCurrentState('admin')}
+          >
+            🔐 ADMIN PANEL
+          </button>
         </div>
       </div>
     )
+  }
+
+  if (currentState === 'admin') {
+    return <AdminPanel onBack={() => setCurrentState('landing')} />
   }
 
   if (currentState === 'nameInput') {

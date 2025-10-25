@@ -118,6 +118,30 @@ body {
   transform: translateY(0);
 }
 
+/* Admin button styles */
+.admin-button {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 15px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.admin-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+}
+
 /* Test Page Styles */
 .test-container {
   background: #1A363A;
