@@ -656,8 +656,10 @@ body {
 
 .score-summary {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   margin-bottom: 40px;
+  gap: 20px;
 }
 
 .score-card {
@@ -700,6 +702,46 @@ body {
   font-weight: bold;
   color: #FFD700;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.score-breakdown {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.breakdown-item {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 15px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 120px;
+  border: 2px solid;
+}
+
+.breakdown-item.correct {
+  border-color: #4CAF50;
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.breakdown-item.incorrect {
+  border-color: #f44336;
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.breakdown-label {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin-bottom: 5px;
+}
+
+.breakdown-count {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
 }
 
 .detailed-results {

@@ -475,6 +475,10 @@ function App() {
       );
     }
     
+    console.log('🎯 Results Display - testResult:', testResult);
+    console.log('🎯 Results Display - detailedAnswers length:', testResult.detailedAnswers?.length);
+    console.log('🎯 Results Display - detailedAnswers:', testResult.detailedAnswers);
+    
     const percentage = Math.round((testResult.score / testResult.totalQuestions) * 100);
     
     return (
@@ -492,10 +496,21 @@ function App() {
                 </div>
                 <div className="percentage">{percentage}%</div>
               </div>
+              
+              <div className="score-breakdown">
+                <div className="breakdown-item correct">
+                  <span className="breakdown-label">Correct:</span>
+                  <span className="breakdown-count">{testResult.detailedAnswers.filter((a: any) => a.isCorrect).length}</span>
+                </div>
+                <div className="breakdown-item incorrect">
+                  <span className="breakdown-label">Incorrect:</span>
+                  <span className="breakdown-count">{testResult.detailedAnswers.filter((a: any) => !a.isCorrect).length}</span>
+                </div>
+              </div>
             </div>
 
             <div className="detailed-results">
-              <h3>Question-by-Question Review</h3>
+              <h3>Question-by-Question Review ({testResult.detailedAnswers.length} Questions)</h3>
               <div className="questions-list">
                 {testResult.detailedAnswers.map((answer: any, index: number) => (
                   <div key={index} className={`question-result ${answer.isCorrect ? 'correct' : 'incorrect'}`}>
