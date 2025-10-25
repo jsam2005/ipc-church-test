@@ -18,10 +18,30 @@ function App() {
   const [userPhone, setUserPhone] = useState('')
   const [loading, setLoading] = useState(true)
 
-  // Load questions from local JSON file
+  // Load questions and restore test state
   useEffect(() => {
     const loadQuestions = async () => {
       try {
+        // Check if there's a saved test in progress
+        const savedTestState = localStorage.getItem('churchTestInProgress')
+        
+        if (savedTestState) {
+          const testState = JSON.parse(savedTestState)
+          console.log('🔄 Restoring test state:', testState)
+          
+          // Restore the saved state
+          setCurrentState(testState.currentState)
+          setCurrentQuestionIndex(testState.currentQuestionIndex)
+          setAnswers(testState.answers)
+          setTimeRemaining(testState.timeRemaining)
+          setUserName(testState.userName)
+          setUserPhone(testState.userPhone)
+          setQuestionsData(testState.questionsData)
+          setSelectedAnswer(testState.answers[testState.currentQuestionIndex])
+          setLoading(false)
+          return
+        }
+        
         // Load questions from local JSON file
         const response = await fetch('/ipc-church-test/questions.json')
         if (!response.ok) {
@@ -58,6 +78,34 @@ function App() {
     return shuffled
   }
 
+  // Save test state to localStorage
+  const saveTestState = () => {
+    if (currentState === 'test' || currentState === 'nameInput') {
+      const testState = {
+        currentState,
+        currentQuestionIndex,
+        answers,
+        timeRemaining,
+        userName,
+        userPhone,
+        questionsData
+      }
+      localStorage.setItem('churchTestInProgress', JSON.stringify(testState))
+      console.log('💾 Test state saved:', testState)
+    }
+  }
+
+  // Clear test state from localStorage
+  const clearTestState = () => {
+    localStorage.removeItem('churchTestInProgress')
+    console.log('🗑️ Test state cleared')
+  }
+
+  // Save test state whenever it changes
+  useEffect(() => {
+    saveTestState()
+  }, [currentState, currentQuestionIndex, answers, timeRemaining, userName, userPhone])
+
   // Timer effect
   useEffect(() => {
     if (currentState === 'test' && timeRemaining > 0) {
@@ -93,34 +141,38 @@ function App() {
 
   const handleTestComplete = async () => {
     try {
-      // Calculate time spent
-      const timeSpent = questionsData.testDuration * 60 - timeRemaining;
-      
-      // Send data to Google Apps Script
-      const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'; // Replace with your actual URL
-      
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: userName,
-          phone: userPhone,
-          answers: answers,
-          timeSpent: timeSpent
-        })
+      // Calculate score
+      let score = 0;
+      questionsData.questions.forEach((question: any, index: number) => {
+        if (answers[index] === question.correctAnswer) {
+          score++;
+        }
       });
-
-      if (response.ok) {
-        console.log('Results saved to Google Sheets successfully');
-        setCurrentState('success');
-      } else {
-        console.error('Failed to save results');
-        setCurrentState('success'); // Still show success to user
-      }
+      
+      // Save results to localStorage (no CORS issues)
+      const testResult = {
+        userName,
+        userPhone,
+        score,
+        totalQuestions: questionsData.questions.length,
+        answers,
+        timestamp: new Date().toLocaleString()
+      };
+      
+      // Store in localStorage
+      const existingResults = JSON.parse(localStorage.getItem('churchTestResults') || '[]');
+      existingResults.push(testResult);
+      localStorage.setItem('churchTestResults', JSON.stringify(existingResults));
+      
+      // Clear the test in progress state
+      clearTestState();
+      
+      console.log('📝 Test completed and saved locally:', testResult);
+      setCurrentState('success');
+      
     } catch (error) {
       console.error('Error saving results:', error);
+      clearTestState();
       setCurrentState('success'); // Still show success to user
     }
   }
@@ -205,6 +257,20 @@ function App() {
           >
             🔐 ADMIN PANEL
           </button>
+          {localStorage.getItem('churchTestInProgress') && (
+            <div className="test-warning">
+              <p>⚠️ You have a test in progress. Refreshing will continue from where you left off.</p>
+              <button 
+                className="clear-test-button"
+                onClick={() => {
+                  clearTestState();
+                  window.location.reload();
+                }}
+              >
+                Start Fresh Test
+              </button>
+            </div>
+          )}
         </div>
       </div>
     )

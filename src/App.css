@@ -142,6 +142,38 @@ body {
   box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
 }
 
+/* Test warning styles */
+.test-warning {
+  background: rgba(255, 193, 7, 0.9);
+  color: #856404;
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 20px;
+  text-align: center;
+  border: 2px solid #ffc107;
+}
+
+.test-warning p {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.clear-test-button {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.clear-test-button:hover {
+  background: #c82333;
+}
+
 /* Test Page Styles */
 .test-container {
   background: #1A363A;
