@@ -1,0 +1,18 @@
+runtime: nodejs18
+env: standard
+instance_class: F1
+automatic_scaling:
+  min_instances: 0
+  max_instances: 10
+env_variables:
+  GOOGLE_SHEET_ID: "1SuLE2EpE8bItFm6Md7i4BjNMD_CV4o5jVyj7xUpJ7G4"
+  GOOGLE_TYPE: "service_account"
+  GOOGLE_PROJECT_ID: "gen-lang-client-0541124298"
+  GOOGLE_PRIVATE_KEY_ID: "d48a75bac96dfec522b0e5a8f395b93afe530896"
+  GOOGLE_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY_HERE\n-----END PRIVATE KEY-----\n"
+  GOOGLE_CLIENT_EMAIL: "church-test-service@gen-lang-client-0541124298.iam.gserviceaccount.com"
+  GOOGLE_CLIENT_ID: "116623561556549941217"
+  GOOGLE_AUTH_URI: "https://accounts.google.com/o/oauth2/auth"
+  GOOGLE_TOKEN_URI: "https://oauth2.googleapis.com/token"
+  GOOGLE_AUTH_PROVIDER_X509_CERT_URL: "https://www.googleapis.com/oauth2/v1/certs"
+  GOOGLE_CLIENT_X509_CERT_URL: "https://www.googleapis.com/robot/v1/metadata/x509/church-test-service%40gen-lang-client-0541124298.iam.gserviceaccount.com"
