@@ -1,14 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import './AdminPanel.css';
 
+interface DetailedAnswer {
+  questionNumber: number;
+  questionText: string;
+  userAnswer: string | null;
+  userAnswerText: string;
+  correctAnswer: string | null;
+  correctAnswerText: string;
+  isCorrect: boolean;
+  optionA: string;
+  optionB: string;
+  optionC: string;
+  optionD: string;
+}
+
 interface TestResult {
   userName: string;
   userPhone: string;
   score: number;
   totalQuestions: number;
-  answers: { [key: number]: string };
-  detailedAnswers?: any[];
+  answers: string[];
+  detailedAnswers: DetailedAnswer[];
   timestamp: string;
+}
+
+interface RankedResult extends TestResult {
+  percentage: number;
+  rank: number;
 }
 
 interface AdminPanelProps {
@@ -16,17 +35,20 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
-  const [results, setResults] = useState<TestResult[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
+  const [results, setResults] = useState<TestResult[]>([]);
+  const [rankedResults, setRankedResults] = useState<RankedResult[]>([]);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Admin credentials (you can change this)
+  // Admin credentials
   const ADMIN_PASSWORD = 'church2024';
 
   useEffect(() => {
-    loadResults();
-  }, []);
+    if (isAuthenticated) {
+      loadResults();
+    }
+  }, [isAuthenticated]);
 
   const loadResults = () => {
     try {
@@ -34,54 +56,66 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       if (storedResults) {
         const parsedResults = JSON.parse(storedResults);
         setResults(parsedResults);
+        calculateRankings(parsedResults);
       }
     } catch (error) {
       console.error('Error loading results:', error);
     }
   };
 
+  const calculateRankings = (testResults: TestResult[]) => {
+    const resultsWithPercentage = testResults.map(result => ({
+      ...result,
+      percentage: (result.score / result.totalQuestions) * 100,
+    }));
+
+    const sortedResults = resultsWithPercentage.sort((a, b) => {
+      if (b.percentage !== a.percentage) {
+        return b.percentage - a.percentage; // Higher percentage first
+      }
+      // Tie-breaking: earlier timestamp wins
+      return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+    });
+
+    setRankedResults(sortedResults.map((result, index) => ({ ...result, rank: index + 1 })));
+  };
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
-      setPassword('');
     } else {
-      alert('Invalid password!');
+      alert('Incorrect password');
+      setPassword('');
     }
-  };
-
-  const getTopWinners = () => {
-    return results
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3);
   };
 
   const getScorePercentage = (score: number, total: number) => {
     return Math.round((score / total) * 100);
   };
 
-  const exportResults = () => {
+  const exportDetailedCSV = () => {
     if (results.length === 0) {
       alert('No results to export.');
       return;
     }
 
-    // Debug: Log the actual data structure
-    console.log('📊 Exporting results:', results);
-    console.log('📊 First result details:', results[0]);
-    if (results[0] && results[0].detailedAnswers) {
-      console.log('📊 Detailed answers:', results[0].detailedAnswers);
-    }
-
-    // Create detailed CSV with proper data
+    // Create comprehensive CSV with all details
     const headers = [
       'S.No', 'Name', 'Phone', 'Score', 'Total Questions', 'Percentage', 'Timestamp'
     ];
     
-    // Add question columns
+    // Add question columns with full details
     const maxQuestions = Math.max(...results.map(r => r.totalQuestions));
     for (let i = 1; i <= maxQuestions; i++) {
-      headers.push(`Q${i}_Answer`);
+      headers.push(`Q${i}_Question`);
+      headers.push(`Q${i}_UserAnswer`);
+      headers.push(`Q${i}_CorrectAnswer`);
+      headers.push(`Q${i}_Status`);
+      headers.push(`Q${i}_OptionA`);
+      headers.push(`Q${i}_OptionB`);
+      headers.push(`Q${i}_OptionC`);
+      headers.push(`Q${i}_OptionD`);
     }
     
     const csvRows = [headers];
@@ -97,20 +131,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
         result.timestamp
       ];
       
-      // Add answers for each question - use the answers array directly
+      // Add detailed question data
       for (let i = 0; i < maxQuestions; i++) {
-        if (result.answers && result.answers[i]) {
-          // Convert A, B, C, D to actual option text if possible
-          const answerKey = result.answers[i];
-          if (result.detailedAnswers && result.detailedAnswers[i]) {
-            // Use detailed answer text if available
-            row.push(result.detailedAnswers[i].userAnswerText || answerKey);
-          } else {
-            // Fallback to the answer key (A, B, C, D)
-            row.push(answerKey);
-          }
+        const detailedAnswer = result.detailedAnswers[i];
+        if (detailedAnswer) {
+          row.push(detailedAnswer.questionText);
+          row.push(detailedAnswer.userAnswerText);
+          row.push(detailedAnswer.correctAnswerText);
+          row.push(detailedAnswer.isCorrect ? 'Correct' : 'Wrong');
+          row.push(detailedAnswer.optionA);
+          row.push(detailedAnswer.optionB);
+          row.push(detailedAnswer.optionC);
+          row.push(detailedAnswer.optionD);
         } else {
-          row.push('Not answered');
+          // Fill with empty values if no detailed answer
+          row.push('', '', '', '', '', '', '', '');
         }
       }
       
@@ -125,7 +160,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `church-test-results-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `church-test-detailed-results-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
@@ -134,6 +169,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
     if (confirm('Are you sure you want to clear all results? This cannot be undone!')) {
       localStorage.removeItem('churchTestResults');
       setResults([]);
+      setRankedResults([]);
       alert('All results have been cleared!');
     }
   };
@@ -158,41 +194,32 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                   placeholder="Enter admin password"
                   required
                 />
-                <button
-                  type="button"
-                  className="password-toggle"
+                <span 
+                  className="password-toggle" 
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? '👁️' : '👁️‍🗨️'}
-                </button>
+                  {showPassword ? '🙈' : '👁️'}
+                </span>
               </div>
             </div>
-            
-            <button type="submit" className="admin-login-btn">
-              LOGIN
-            </button>
+            <button type="submit" className="admin-login-btn">Login</button>
           </form>
-          
-          <button className="back-btn" onClick={onBack}>
-            ← Back to Test
-          </button>
+          <button className="back-btn" onClick={onBack}>← Back to Test</button>
         </div>
       </div>
     );
   }
 
-  const topWinners = getTopWinners();
-
   return (
     <div className="admin-panel">
       <div className="admin-header">
-        <h1 className="admin-title">IPC Church Test - Admin Panel</h1>
+        <h1 className="admin-title">IPC Church Test - Admin Dashboard</h1>
         <div className="admin-actions">
-          <button className="export-btn" onClick={exportResults}>
-            📊 Export CSV
+          <button className="export-btn" onClick={exportDetailedCSV}>
+            📊 Export Detailed CSV
           </button>
           <button className="clear-btn" onClick={clearAllResults}>
-            🗑️ Clear All
+            🗑️ Clear All Data
           </button>
           <button className="back-btn" onClick={onBack}>
             ← Back to Test
@@ -208,37 +235,33 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
         <div className="stat-card">
           <h3>Average Score</h3>
           <p className="stat-number">
-            {results.length > 0 
-              ? Math.round(results.reduce((sum, r) => sum + r.score, 0) / results.length)
-              : 0
-            }/{results.length > 0 ? results[0].totalQuestions : 25}
+            {results.length > 0
+              ? (results.reduce((sum, r) => sum + r.score, 0) / results.length).toFixed(2)
+              : '0.00'}
+            /{results[0]?.totalQuestions || 0}
           </p>
         </div>
         <div className="stat-card">
           <h3>Highest Score</h3>
           <p className="stat-number">
-            {results.length > 0 ? Math.max(...results.map(r => r.score)) : 0}/{results.length > 0 ? results[0].totalQuestions : 25}
+            {results.length > 0 ? Math.max(...results.map(r => r.score)) : 0}
+            /{results[0]?.totalQuestions || 0}
           </p>
         </div>
       </div>
 
-      {topWinners.length > 0 && (
+      {results.length > 0 && (
         <div className="winners-section">
           <h2 className="winners-title">🏆 Top 3 Winners</h2>
           <div className="winners-grid">
-            {topWinners.map((winner, index) => (
+            {rankedResults.slice(0, 3).map((winner, index) => (
               <div key={index} className={`winner-card ${index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze'}`}>
-                <div className="winner-rank">
-                  {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
-                </div>
+                <span className="winner-rank">{index + 1}</span>
                 <div className="winner-info">
-                  <h3 className="winner-name">{winner.userName}</h3>
+                  <p className="winner-name">{winner.userName}</p>
                   <p className="winner-phone">{winner.userPhone}</p>
-                  <p className="winner-score">
-                    {winner.score}/{winner.totalQuestions} 
-                    ({getScorePercentage(winner.score, winner.totalQuestions)}%)
-                  </p>
-                  <p className="winner-time">{winner.timestamp}</p>
+                  <p className="winner-score">Score: {winner.score}/{winner.totalQuestions} ({winner.percentage.toFixed(2)}%)</p>
+                  <p className="winner-time">Time: {winner.timestamp}</p>
                 </div>
               </div>
             ))}
@@ -247,52 +270,46 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       )}
 
       <div className="results-section">
-        <h2 className="results-title">All Results ({results.length})</h2>
-        <div className="results-table-container">
-          <table className="results-table">
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Score</th>
-                <th>Percentage</th>
-                <th>Timestamp</th>
-              </tr>
-            </thead>
-            <tbody>
-              {results
-                .sort((a, b) => b.score - a.score)
-                .map((result, index) => (
-                  <tr key={index} className={index < 3 ? 'top-three' : ''}>
+        <h2 className="results-title">All Test Results ({results.length})</h2>
+        {results.length === 0 ? (
+          <div className="no-results">
+            <h3>No test results yet</h3>
+            <p>Results will appear here once users complete the test.</p>
+          </div>
+        ) : (
+          <div className="results-table-container">
+            <table className="results-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Score</th>
+                  <th>Percentage</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rankedResults.map((result) => (
+                  <tr key={result.timestamp + result.userName} className={result.rank <= 3 ? 'top-three' : ''}>
                     <td className="rank-cell">
-                      {index + 1}
-                      {index === 0 && ' 🥇'}
-                      {index === 1 && ' 🥈'}
-                      {index === 2 && ' 🥉'}
+                      {result.rank}
+                      {result.rank === 1 && ' 🥇'}
+                      {result.rank === 2 && ' 🥈'}
+                      {result.rank === 3 && ' 🥉'}
                     </td>
                     <td className="name-cell">{result.userName}</td>
                     <td className="phone-cell">{result.userPhone}</td>
-                    <td className="score-cell">
-                      {result.score}/{result.totalQuestions}
-                    </td>
-                    <td className="percentage-cell">
-                      {getScorePercentage(result.score, result.totalQuestions)}%
-                    </td>
+                    <td className="score-cell">{result.score}/{result.totalQuestions}</td>
+                    <td className="percentage-cell">{result.percentage.toFixed(2)}%</td>
                     <td className="timestamp-cell">{result.timestamp}</td>
                   </tr>
                 ))}
-            </tbody>
-          </table>
-        </div>
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
-
-      {results.length === 0 && (
-        <div className="no-results">
-          <h3>No test results yet</h3>
-          <p>Results will appear here once users complete the test.</p>
-        </div>
-      )}
     </div>
   );
 };
