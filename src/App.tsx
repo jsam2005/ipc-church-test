@@ -27,7 +27,7 @@ function App() {
         setCurrentState('landing')
         
         // Load questions from local JSON file
-        const response = await fetch('/ipc-church-test/questions.json')
+        const response = await fetch('./questions.json')
         if (!response.ok) {
           throw new Error('Failed to load questions')
         }
@@ -234,12 +234,18 @@ function App() {
       console.log(`🎯 Final Score: ${score}/${questionsData.questions.length}`);
       
       // Store the result for display
-      setTestResult({
+      const resultForDisplay = {
         ...testResult,
         detailedAnswers
-      });
+      };
       
-      setCurrentState('results');
+      console.log('🎯 Setting test result for display:', resultForDisplay);
+      setTestResult(resultForDisplay);
+      
+      // Add a small delay to ensure state is set
+      setTimeout(() => {
+        setCurrentState('results');
+      }, 100);
       
     } catch (error) {
       console.error('Error saving results:', error);
@@ -456,6 +462,19 @@ function App() {
   }
 
   if (currentState === 'results') {
+    if (!testResult) {
+      return (
+        <div className="app">
+          <div className="results-container">
+            <div className="results-content">
+              <h1 className="results-title">Loading Results...</h1>
+              <p>Please wait while we load your test results.</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
     const percentage = Math.round((testResult.score / testResult.totalQuestions) * 100);
     
     return (
@@ -546,6 +565,25 @@ function App() {
               >
                 TAKE TEST AGAIN
               </button>
+              {testResult && (
+                <button 
+                  className="results-button"
+                  onClick={() => setCurrentState('results')}
+                  style={{
+                    background: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    padding: '12px 24px',
+                    borderRadius: '8px',
+                    fontSize: '1rem',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    margin: '10px'
+                  }}
+                >
+                  📊 VIEW RESULTS
+                </button>
+              )}
             </div>
           </div>
         </div>
