@@ -13,7 +13,8 @@
     "setup": "node setup.js",
     "analyze": "node analyze-results.js",
     "deploy": "npm run build && vercel --prod",
-    "deploy-guide": "node deploy.js"
+    "deploy-guide": "node deploy.js",
+    "convert-env": "node convert-credentials.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
