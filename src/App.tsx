@@ -17,18 +17,26 @@ function App() {
   const [userPhone, setUserPhone] = useState('')
   const [loading, setLoading] = useState(true)
 
-  // Load questions from server on component mount
+  // Load questions from local JSON file
   useEffect(() => {
     const loadQuestions = async () => {
       try {
-        const response = await fetch('/api/questions')
+        // Load questions from local JSON file
+        const response = await fetch('/ipc-church-test/questions.json')
         if (!response.ok) {
           throw new Error('Failed to load questions')
         }
-        const data = await response.json()
-        setQuestionsData(data)
-        setAnswers(new Array(data.questions.length).fill(null))
-        setTimeRemaining(data.testDuration * 60)
+        const questions = await response.json()
+        
+        // Shuffle questions for this user
+        const shuffledQuestions = shuffleArray(questions)
+        
+        setQuestionsData({
+          questions: shuffledQuestions,
+          testDuration: 15
+        })
+        setAnswers(new Array(questions.length).fill(null))
+        setTimeRemaining(15 * 60)
         setLoading(false)
       } catch (error) {
         console.error('Error loading questions:', error)
@@ -38,6 +46,16 @@ function App() {
     
     loadQuestions()
   }, [])
+
+  // Shuffle array function
+  const shuffleArray = (array: any[]) => {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+  }
 
   // Timer effect
   useEffect(() => {
@@ -77,8 +95,10 @@ function App() {
       // Calculate time spent
       const timeSpent = questionsData.testDuration * 60 - timeRemaining;
       
-      // Send data to backend
-      const response = await fetch('/api/save-results', {
+      // Send data to Google Apps Script
+      const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'; // Replace with your actual URL
+      
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +112,7 @@ function App() {
       });
 
       if (response.ok) {
-        console.log('Results saved successfully');
+        console.log('Results saved to Google Sheets successfully');
         setCurrentState('success');
       } else {
         console.error('Failed to save results');
