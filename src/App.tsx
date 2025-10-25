@@ -221,8 +221,10 @@ function App() {
       
       // Store in localStorage
       const existingResults = JSON.parse(localStorage.getItem('churchTestResults') || '[]');
+      console.log('💾 Before saving - existing results:', existingResults);
       existingResults.push(testResult);
       localStorage.setItem('churchTestResults', JSON.stringify(existingResults));
+      console.log('💾 After saving - all results:', JSON.parse(localStorage.getItem('churchTestResults') || '[]'));
       
       // Clear the test in progress state
       clearTestState();

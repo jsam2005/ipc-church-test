@@ -53,10 +53,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
   const loadResults = () => {
     try {
       const storedResults = localStorage.getItem('churchTestResults');
+      console.log('🔍 Admin Panel - Raw localStorage data:', storedResults);
+      
       if (storedResults) {
         const parsedResults = JSON.parse(storedResults);
+        console.log('🔍 Admin Panel - Parsed results:', parsedResults);
+        console.log('🔍 Admin Panel - Number of results:', parsedResults.length);
         setResults(parsedResults);
         calculateRankings(parsedResults);
+      } else {
+        console.log('🔍 Admin Panel - No stored results found');
       }
     } catch (error) {
       console.error('Error loading results:', error);
@@ -217,6 +223,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
         <div className="admin-actions">
           <button className="export-btn" onClick={exportDetailedCSV}>
             📊 Export Detailed CSV
+          </button>
+          <button className="refresh-btn" onClick={loadResults}>
+            🔄 Refresh Data
           </button>
           <button className="clear-btn" onClick={clearAllResults}>
             🗑️ Clear All Data

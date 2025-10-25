@@ -171,6 +171,16 @@
   box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
 }
 
+.refresh-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.refresh-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+}
+
 .clear-btn {
   background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
   color: white;
