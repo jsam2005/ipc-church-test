@@ -550,6 +550,23 @@ function App() {
               >
                 TAKE TEST AGAIN
               </button>
+              <button 
+                className="scroll-top-button"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                style={{
+                  background: '#17a2b8',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  margin: '10px'
+                }}
+              >
+                ⬆️ SCROLL TO TOP
+              </button>
             </div>
           </div>
         </div>
