@@ -147,6 +147,21 @@
   .admin-panel {
     padding: 10px;
   }
+  
+  /* Force admin actions to stack vertically on mobile */
+  .admin-actions {
+    flex-direction: column !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  .admin-actions > * {
+    width: 100% !important;
+    max-width: 300px !important;
+    margin: 5px 0 !important;
+    display: block !important;
+  }
 }
 
 .admin-header {
@@ -432,15 +447,17 @@
   
   .admin-actions {
     justify-content: center;
-    flex-direction: column;
+    flex-direction: column !important;
     width: 100%;
-    display: flex;
+    display: flex !important;
+    align-items: center;
   }
   
   .export-btn, .clear-btn, .back-btn {
-    width: 100%;
-    margin: 5px 0;
-    display: block;
+    width: 100% !important;
+    margin: 5px 0 !important;
+    display: block !important;
+    max-width: 300px;
   }
   
   .stats-summary {
@@ -589,8 +606,17 @@
   }
   
   .admin-actions {
-    flex-direction: column;
+    flex-direction: column !important;
     width: 100%;
+    display: flex !important;
+    align-items: center;
+  }
+  
+  .export-btn, .clear-btn, .back-btn {
+    width: 100% !important;
+    margin: 5px 0 !important;
+    display: block !important;
+    max-width: 300px;
   }
   
   .stats-summary {
