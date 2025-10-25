@@ -69,16 +69,38 @@ function shuffleArray(array) {
 // Initialize Google Sheets API
 async function getGoogleSheets() {
   try {
-    // Check if credentials file exists
-    const credentialsPath = path.join(__dirname, 'credentials.json');
-    if (!fs.existsSync(credentialsPath)) {
-      console.log('⚠️  credentials.json not found. Google Sheets integration disabled.');
-      console.log('📖 Follow GOOGLE_SHEETS_SETUP.md to enable Google Sheets integration.');
+    // Check if environment variables are set
+    const requiredEnvVars = [
+      'GOOGLE_TYPE', 'GOOGLE_PROJECT_ID', 'GOOGLE_PRIVATE_KEY_ID', 
+      'GOOGLE_PRIVATE_KEY', 'GOOGLE_CLIENT_EMAIL', 'GOOGLE_CLIENT_ID',
+      'GOOGLE_AUTH_URI', 'GOOGLE_TOKEN_URI', 'GOOGLE_AUTH_PROVIDER_X509_CERT_URL',
+      'GOOGLE_CLIENT_X509_CERT_URL'
+    ];
+    
+    const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+    if (missingVars.length > 0) {
+      console.log('⚠️  Google Sheets environment variables not found. Google Sheets integration disabled.');
+      console.log('📖 Set the following environment variables:');
+      console.log(missingVars.join(', '));
       return null;
     }
 
+    // Create credentials object from environment variables
+    const credentials = {
+      type: process.env.GOOGLE_TYPE,
+      project_id: process.env.GOOGLE_PROJECT_ID,
+      private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID,
+      private_key: process.env.GOOGLE_PRIVATE_KEY,
+      client_email: process.env.GOOGLE_CLIENT_EMAIL,
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      auth_uri: process.env.GOOGLE_AUTH_URI,
+      token_uri: process.env.GOOGLE_TOKEN_URI,
+      auth_provider_x509_cert_url: process.env.GOOGLE_AUTH_PROVIDER_X509_CERT_URL,
+      client_x509_cert_url: process.env.GOOGLE_CLIENT_X509_CERT_URL
+    };
+
     const auth = new google.auth.GoogleAuth({
-      keyFile: credentialsPath,
+      credentials: credentials,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
 
