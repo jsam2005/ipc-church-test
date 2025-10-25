@@ -154,21 +154,50 @@ function App() {
 
   const handleTestComplete = async () => {
     try {
-      // Calculate score
+      // Calculate score - fix the comparison logic
       let score = 0;
+      const detailedAnswers = [];
+      
       questionsData.questions.forEach((question: any, index: number) => {
-        if (answers[index] === question.correctAnswer) {
+        const userAnswer = answers[index];
+        const correctAnswerText = question.correctAnswer;
+        
+        // Find which option (A, B, C, D) corresponds to the correct answer text
+        let correctOption = null;
+        Object.entries(question.options).forEach(([key, value]) => {
+          if (value === correctAnswerText) {
+            correctOption = key;
+          }
+        });
+        
+        // Check if user's answer matches the correct option
+        const isCorrect = userAnswer === correctOption;
+        if (isCorrect) {
           score++;
         }
+        
+        // Store detailed answer for CSV
+        detailedAnswers.push({
+          questionNumber: index + 1,
+          questionText: question.question,
+          userAnswer: userAnswer,
+          userAnswerText: userAnswer ? question.options[userAnswer] : 'Not answered',
+          correctAnswer: correctOption,
+          correctAnswerText: correctAnswerText,
+          isCorrect: isCorrect
+        });
+        
+        console.log(`Question ${index + 1}: User=${userAnswer}, Correct=${correctOption}, Match=${isCorrect}`);
       });
       
-      // Save results to localStorage (no CORS issues)
+      // Save results to localStorage with detailed answers
       const testResult = {
         userName,
         userPhone,
         score,
         totalQuestions: questionsData.questions.length,
         answers,
+        detailedAnswers,
         timestamp: new Date().toLocaleString()
       };
       
@@ -181,6 +210,7 @@ function App() {
       clearTestState();
       
       console.log('📝 Test completed and saved locally:', testResult);
+      console.log(`🎯 Final Score: ${score}/${questionsData.questions.length}`);
       setCurrentState('success');
       
     } catch (error) {

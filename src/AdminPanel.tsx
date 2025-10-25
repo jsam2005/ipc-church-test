@@ -60,22 +60,56 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
   };
 
   const exportResults = () => {
-    const csvContent = [
-      ['Name', 'Phone', 'Score', 'Percentage', 'Timestamp'],
-      ...results.map(result => [
+    if (results.length === 0) {
+      alert('No results to export.');
+      return;
+    }
+
+    // Create detailed CSV with all answers
+    const headers = [
+      'S.No', 'Name', 'Phone', 'Score', 'Total Questions', 'Percentage', 'Timestamp'
+    ];
+    
+    // Add question columns (Q1, Q2, Q3, etc.)
+    const maxQuestions = Math.max(...results.map(r => r.totalQuestions));
+    for (let i = 1; i <= maxQuestions; i++) {
+      headers.push(`Q${i}`);
+    }
+    
+    const csvRows = [headers];
+    
+    results.forEach((result, resultIndex) => {
+      const row = [
+        resultIndex + 1, // S.No
         result.userName,
         result.userPhone,
         result.score,
-        getScorePercentage(result.score, result.totalQuestions),
+        result.totalQuestions,
+        getScorePercentage(result.score, result.totalQuestions) + '%',
         result.timestamp
-      ])
-    ].map(row => row.join(',')).join('\n');
+      ];
+      
+      // Add answers for each question
+      for (let i = 0; i < maxQuestions; i++) {
+        if (result.answers && result.answers[i]) {
+          row.push(result.answers[i]);
+        } else {
+          row.push('Not answered');
+        }
+      }
+      
+      csvRows.push(row);
+    });
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const csvContent = csvRows.map(row => 
+      row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `church-test-results-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `church-test-results-detailed-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
