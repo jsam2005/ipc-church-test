@@ -54,6 +54,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
     try {
       const storedResults = localStorage.getItem('churchTestResults');
       console.log('🔍 Admin Panel - Raw localStorage data:', storedResults);
+      console.log('🔍 Admin Panel - All localStorage keys:', Object.keys(localStorage));
       
       if (storedResults) {
         const parsedResults = JSON.parse(storedResults);
@@ -63,6 +64,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
         calculateRankings(parsedResults);
       } else {
         console.log('🔍 Admin Panel - No stored results found');
+        console.log('🔍 Admin Panel - Available localStorage items:');
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          console.log(`  ${key}: ${localStorage.getItem(key)}`);
+        }
       }
     } catch (error) {
       console.error('Error loading results:', error);
