@@ -22,25 +22,8 @@ function App() {
   useEffect(() => {
     const loadQuestions = async () => {
       try {
-        // Check if there's a saved test in progress
-        const savedTestState = localStorage.getItem('churchTestInProgress')
-        
-        if (savedTestState) {
-          const testState = JSON.parse(savedTestState)
-          console.log('🔄 Restoring test state:', testState)
-          
-          // Restore the saved state
-          setCurrentState(testState.currentState)
-          setCurrentQuestionIndex(testState.currentQuestionIndex)
-          setAnswers(testState.answers)
-          setTimeRemaining(testState.timeRemaining)
-          setUserName(testState.userName)
-          setUserPhone(testState.userPhone)
-          setQuestionsData(testState.questionsData)
-          setSelectedAnswer(testState.answers[testState.currentQuestionIndex])
-          setLoading(false)
-          return
-        }
+        // Always start with landing page, don't auto-restore test state
+        setCurrentState('landing')
         
         // Load questions from local JSON file
         const response = await fetch('/ipc-church-test/questions.json')
@@ -137,6 +120,36 @@ function App() {
   }, [currentState, timeRemaining])
 
   const handleStartTest = () => {
+    // Check if there's a saved test in progress
+    const savedTestState = localStorage.getItem('churchTestInProgress')
+    
+    if (savedTestState) {
+      const testState = JSON.parse(savedTestState)
+      console.log('🔄 Found saved test state:', testState)
+      
+      // Ask user if they want to continue
+      const shouldContinue = confirm(
+        `You have a test in progress (Question ${testState.currentQuestionIndex + 1} of ${testState.questionsData.questions.length}).\n\nDo you want to continue where you left off?`
+      )
+      
+      if (shouldContinue) {
+        // Restore the saved state
+        setCurrentState(testState.currentState)
+        setCurrentQuestionIndex(testState.currentQuestionIndex)
+        setAnswers(testState.answers)
+        setTimeRemaining(testState.timeRemaining)
+        setUserName(testState.userName)
+        setUserPhone(testState.userPhone)
+        setQuestionsData(testState.questionsData)
+        setSelectedAnswer(testState.answers[testState.currentQuestionIndex])
+        return
+      } else {
+        // Clear the saved state and start fresh
+        clearTestState()
+      }
+    }
+    
+    // Start fresh test
     setCurrentState('nameInput')
   }
 
@@ -329,7 +342,7 @@ function App() {
   }
 
   if (currentState === 'nameInput') {
-    return (
+  return (
       <div className="app">
         <div className="name-input-container">
           <div className="name-input-content">
@@ -382,7 +395,7 @@ function App() {
             <div className="header-top">
               <button className="back-to-home" onClick={() => setCurrentState('landing')}>
                 ← HOME
-              </button>
+        </button>
               <h2>QUESTION {currentQuestionIndex + 1}</h2>
               <div className={`timer ${timeRemaining < 300 ? 'timer-warning' : ''}`}>
                 Time Remaining: {formatTime(timeRemaining)}
@@ -459,7 +472,7 @@ function App() {
           </div>
         </div>
       </div>
-    )
+  )
   }
 
   return null
