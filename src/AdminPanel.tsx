@@ -7,6 +7,7 @@ interface TestResult {
   score: number;
   totalQuestions: number;
   answers: { [key: number]: string };
+  detailedAnswers?: any[];
   timestamp: string;
 }
 
@@ -111,7 +112,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
         }
       }
       
-      csvRows.push(row);
+      csvRows.push(row.map(cell => String(cell)));
     });
 
     const csvContent = csvRows.map(row => 

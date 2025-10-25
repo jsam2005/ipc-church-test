@@ -169,7 +169,7 @@ function App() {
     try {
       // Calculate score - fix the comparison logic
       let score = 0;
-      const detailedAnswers = [];
+      const detailedAnswers: any[] = [];
       
       questionsData.questions.forEach((question: any, index: number) => {
         const userAnswer = answers[index];
