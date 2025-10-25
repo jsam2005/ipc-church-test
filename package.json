@@ -14,7 +14,8 @@
     "analyze": "node analyze-results.js",
     "deploy": "npm run build && vercel --prod",
     "deploy-guide": "node deploy.js",
-    "convert-env": "node convert-credentials.js"
+    "convert-env": "node convert-credentials.js",
+    "setup-railway": "node setup-railway.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
