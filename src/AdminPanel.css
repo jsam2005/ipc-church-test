@@ -412,6 +412,8 @@
 @media (max-width: 768px) {
   .admin-panel {
     padding: 10px;
+    display: flex;
+    flex-direction: column;
   }
   
   .admin-header {
@@ -419,32 +421,40 @@
     text-align: center;
     padding: 20px;
     gap: 15px;
+    width: 100%;
   }
   
   .admin-title {
     font-size: 1.8rem;
     margin-bottom: 10px;
+    width: 100%;
   }
   
   .admin-actions {
     justify-content: center;
     flex-direction: column;
     width: 100%;
+    display: flex;
   }
   
   .export-btn, .clear-btn, .back-btn {
     width: 100%;
     margin: 5px 0;
+    display: block;
   }
   
   .stats-summary {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 15px;
     margin-bottom: 20px;
+    width: 100%;
   }
   
   .stat-card {
     padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .stat-card h3 {
@@ -458,16 +468,20 @@
   .winners-section {
     padding: 20px;
     margin-bottom: 20px;
+    width: 100%;
   }
   
   .winners-title {
     font-size: 1.5rem;
     margin-bottom: 20px;
+    text-align: center;
   }
   
   .winners-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 15px;
+    width: 100%;
   }
   
   .winner-card {
@@ -475,6 +489,8 @@
     text-align: center;
     padding: 20px;
     gap: 15px;
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .winner-rank {
@@ -492,21 +508,25 @@
   
   .results-section {
     padding: 20px;
+    width: 100%;
   }
   
   .results-title {
     font-size: 1.5rem;
     margin-bottom: 15px;
+    text-align: center;
   }
   
   .results-table-container {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    width: 100%;
   }
   
   .results-table {
     font-size: 0.75rem;
     min-width: 600px;
+    width: 100%;
   }
   
   .results-table th,
@@ -540,6 +560,8 @@
   
   .no-results {
     padding: 40px 20px;
+    text-align: center;
+    width: 100%;
   }
   
   .no-results h3 {
@@ -551,22 +573,37 @@
 @media (max-width: 480px) {
   .admin-panel {
     padding: 5px;
+    display: flex;
+    flex-direction: column;
   }
   
   .admin-header {
     padding: 15px;
+    flex-direction: column;
+    width: 100%;
   }
   
   .admin-title {
     font-size: 1.5rem;
+    width: 100%;
+  }
+  
+  .admin-actions {
+    flex-direction: column;
+    width: 100%;
   }
   
   .stats-summary {
+    display: flex;
+    flex-direction: column;
     gap: 10px;
+    width: 100%;
   }
   
   .stat-card {
     padding: 15px;
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .stat-number {
@@ -575,10 +612,19 @@
   
   .winners-section, .results-section {
     padding: 15px;
+    width: 100%;
+  }
+  
+  .winners-grid {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
   }
   
   .winner-card {
     padding: 15px;
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .winner-rank {
@@ -592,6 +638,7 @@
   .results-table {
     font-size: 0.7rem;
     min-width: 500px;
+    width: 100%;
   }
   
   .results-table th,
