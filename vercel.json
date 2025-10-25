@@ -20,7 +20,9 @@
       "dest": "/dist/$1"
     }
   ],
-  "env": {
-    "GOOGLE_SHEET_ID": "1SuLE2EpE8bItFm6Md7i4BjNMD_CV4o5jVyj7xUpJ7G4"
+  "functions": {
+    "server.js": {
+      "maxDuration": 30
+    }
   }
 }
