@@ -109,11 +109,44 @@
   background: #555;
 }
 
+/* Mobile responsive for admin login */
+@media (max-width: 768px) {
+  .admin-login-container {
+    padding: 30px 20px;
+    margin: 10px;
+  }
+  
+  .admin-title {
+    font-size: 1.8rem;
+  }
+  
+  .admin-subtitle {
+    font-size: 1rem;
+  }
+  
+  .password-input {
+    font-size: 1rem;
+    padding: 12px 45px 12px 12px;
+  }
+  
+  .admin-login-btn {
+    font-size: 1.1rem;
+    padding: 12px;
+  }
+}
+
 /* Admin Panel Styles */
 .admin-panel {
   min-height: 100vh;
   background: #f5f5f5;
   padding: 20px;
+}
+
+/* Mobile responsive for admin panel */
+@media (max-width: 768px) {
+  .admin-panel {
+    padding: 10px;
+  }
 }
 
 .admin-header {
@@ -377,34 +410,192 @@
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  .admin-panel {
+    padding: 10px;
+  }
+  
   .admin-header {
     flex-direction: column;
     text-align: center;
+    padding: 20px;
+    gap: 15px;
   }
   
   .admin-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
   }
   
   .admin-actions {
     justify-content: center;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .export-btn, .clear-btn, .back-btn {
+    width: 100%;
+    margin: 5px 0;
+  }
+  
+  .stats-summary {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .stat-card {
+    padding: 20px;
+  }
+  
+  .stat-card h3 {
+    font-size: 1rem;
+  }
+  
+  .stat-number {
+    font-size: 2rem;
+  }
+  
+  .winners-section {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .winners-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
   }
   
   .winners-grid {
     grid-template-columns: 1fr;
+    gap: 15px;
   }
   
   .winner-card {
     flex-direction: column;
     text-align: center;
+    padding: 20px;
+    gap: 15px;
+  }
+  
+  .winner-rank {
+    font-size: 2.5rem;
+    min-width: auto;
+  }
+  
+  .winner-name {
+    font-size: 1.3rem;
+  }
+  
+  .winner-phone, .winner-score, .winner-time {
+    font-size: 0.9rem;
+  }
+  
+  .results-section {
+    padding: 20px;
+  }
+  
+  .results-title {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+  
+  .results-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .results-table {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    min-width: 600px;
   }
   
   .results-table th,
   .results-table td {
-    padding: 8px 5px;
+    padding: 8px 4px;
+    white-space: nowrap;
+  }
+  
+  .results-table th {
+    font-size: 0.7rem;
+    padding: 10px 4px;
+  }
+  
+  .rank-cell, .score-cell, .percentage-cell {
+    text-align: center;
+    min-width: 50px;
+  }
+  
+  .name-cell {
+    min-width: 100px;
+  }
+  
+  .phone-cell {
+    min-width: 80px;
+  }
+  
+  .timestamp-cell {
+    min-width: 120px;
+    font-size: 0.7rem;
+  }
+  
+  .no-results {
+    padding: 40px 20px;
+  }
+  
+  .no-results h3 {
+    font-size: 1.3rem;
+  }
+}
+
+/* Extra small phones */
+@media (max-width: 480px) {
+  .admin-panel {
+    padding: 5px;
+  }
+  
+  .admin-header {
+    padding: 15px;
+  }
+  
+  .admin-title {
+    font-size: 1.5rem;
+  }
+  
+  .stats-summary {
+    gap: 10px;
+  }
+  
+  .stat-card {
+    padding: 15px;
+  }
+  
+  .stat-number {
+    font-size: 1.8rem;
+  }
+  
+  .winners-section, .results-section {
+    padding: 15px;
+  }
+  
+  .winner-card {
+    padding: 15px;
+  }
+  
+  .winner-rank {
+    font-size: 2rem;
+  }
+  
+  .winner-name {
+    font-size: 1.2rem;
+  }
+  
+  .results-table {
+    font-size: 0.7rem;
+    min-width: 500px;
+  }
+  
+  .results-table th,
+  .results-table td {
+    padding: 6px 3px;
   }
 }
